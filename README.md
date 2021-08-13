@@ -1,2 +1,2 @@
-# Pac-Man-AI
-Pac-Man game AI
+#PACMAN
+Implementing Q learning in PacMan.
