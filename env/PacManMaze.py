@@ -1,5 +1,30 @@
 import pygame
 
+# SCREEN SIZES
+tile_size = 16
+width = 28 * tile_size
+height = 31 * tile_size
+screen = pygame.display.set_mode((width, height))
+cols, rows = (28, 31)
+grid = [[0 for i in range(cols)] for j in range(rows)]
+
+class Player:
+
+    def __init__(self, x, y, grid, screen):
+        self.x = x
+        self.y = y
+        self.screen = screen
+        self.grid = grid
+
+    def draw(self):
+        pygame.draw.circle(self.screen, WHITE, (tile_size * self.x + tile_size / 2, tile_size * self.y + tile_size / 2),
+                           (tile_size - 4) / 2)
+#lorikatia
+    def set_pos(self, x, y):
+        if(self.grid[y][x]==1):
+            self.x = x
+            self.y = y
+
 pygame.init()
 done = False
 # MAP
@@ -8,13 +33,7 @@ done = False
 WHITE = (255, 255, 255)
 GRAY = (255 // 2, 255 // 2, 255 // 2)
 BLACK = (0, 0, 0)
-# SCREEN SIZES
-tile_size = 16
-width = 28 * tile_size
-height = 31 * tile_size
-screen = pygame.display.set_mode((width, height))
-cols, rows = (28, 31)
-grid = [[0 for i in range(cols)] for j in range(rows)]
+
 print(grid)
 
 grid = [
@@ -51,9 +70,11 @@ grid = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
 
 sum = 0
+
 for x in grid:
     for j in x:
-        sum+= j
+        sum += j
+
 print(sum)
 sprites = pygame.image.load("../images/map.png")
 
@@ -69,11 +90,11 @@ def draw_map(screen, grid):
 def draw_line(at, to, grid):
     print(to, at)
     if at[0] == to[0]:
-        decY = 1
         if at[1] - to[1] > 0:
             for x in range(to[1], at[1] + 1):
                 grid[x][at[0]] = 1
             return
+
         for x in range(at[1], to[1] + 1):
             grid[x][at[0]] = 1
         return
@@ -85,6 +106,7 @@ def draw_line(at, to, grid):
             return
 
         for x in range(at[0], to[0] + 1):
+
             grid[at[1]][x] = 1
         return
 
@@ -93,6 +115,9 @@ mouseCounter = 0
 mouseRes = [0, 0]
 at = 0
 to = 0
+
+player = Player(1, 1,grid,screen)
+
 while not done:
     screen.fill(BLACK)
     screen.blit(sprites, (0, 0), (0, tile_size * 3, width, height))
@@ -120,6 +145,25 @@ while not done:
                           grid)
                 print("Line Draw")
             mouseCounter += 1
+        if event.type == pygame.KEYDOWN:
+            pressed = pygame.key.get_pressed()
+
+            if pressed[pygame.K_a]:
+                print("A")
+                player.set_pos(player.x-1,player.y)
+            if pressed[pygame.K_d]:
+                print("D")
+                player.set_pos(player.x+1,player.y)
+
+            if pressed[pygame.K_w]:
+                print("W")
+                player.set_pos(player.x,player.y-1)
+
+            if pressed[pygame.K_s]:
+                print("S")
+                player.set_pos(player.x,player.y+1)
+
+    player.draw()
 
     # print(pygame.mouse.get_pressed(1))
 
