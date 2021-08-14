@@ -244,9 +244,10 @@ class ApproximateQAgent(PacmanQAgent):
 
         i = 0
         #difference
+
         diff = (reward + self.discount * sum) - self.getQValue(state, action)
         for f in self.featExtractor.getFeatures(state, action):
-
+            print diff
             self.weights[i,state,action] = self.weights[i,state,action] + self.alpha * diff * self.featExtractor.getFeatures(state,action).get(f)
             i += 1
 
@@ -263,5 +264,4 @@ class ApproximateQAgent(PacmanQAgent):
         if self.episodesSoFar == self.numTraining:
             # you might want to print your weights here for debugging
             "*** YOUR CODE HERE ***"
-            print
             pass
