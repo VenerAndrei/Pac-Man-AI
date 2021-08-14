@@ -218,12 +218,11 @@ class ApproximateQAgent(PacmanQAgent):
         "*** YOUR CODE HERE ***"
         sum = 0.0
         i = 0
-        if not self.featExtractor.getFeatures(state,action):
-            print 'da'
+
         for f in self.featExtractor.getFeatures(state,action):
-            sum += self.featExtractor.getFeatures(state,action).get(f)* self.weights[i,state,action]
+            sum += self.featExtractor.getFeatures(state,action).get(f)* self.weights[f]
             i+=1
-        #self.qval[state, action] = sum
+        self.qval[state, action] = sum
         return sum
         util.raiseNotDefined()
 
@@ -247,8 +246,7 @@ class ApproximateQAgent(PacmanQAgent):
 
         diff = (reward + self.discount * sum) - self.getQValue(state, action)
         for f in self.featExtractor.getFeatures(state, action):
-            print diff
-            self.weights[i,state,action] = self.weights[i,state,action] + self.alpha * diff * self.featExtractor.getFeatures(state,action).get(f)
+            self.weights[f] = self.weights[f] + self.alpha * diff * self.featExtractor.getFeatures(state,action).get(f)
             i += 1
 
 
