@@ -2,6 +2,7 @@ import pygame
 from env.Ghost import Ghost
 from env.Player import Player
 from utils.Graph import *
+
 # SCREEN SIZES
 tile_size = 16
 width = 28 * tile_size
@@ -9,7 +10,6 @@ height = 31 * tile_size
 screen = pygame.display.set_mode((width, height))
 cols, rows = (28, 31)
 grid = [[0 for i in range(cols)] for j in range(rows)]
-
 
 pygame.init()
 done = False
@@ -36,9 +36,9 @@ grid = [
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
@@ -57,8 +57,8 @@ grid = [
 
 sum = 0
 
-nodes,copy = get_number_of_nodes_from_grid(grid)
-#print("Avem : {}\n".format(get_number_of_nodes_from_grid(grid)))
+
+# print("Avem : {}\n".format(get_number_of_nodes_from_grid(grid)))
 
 
 def draw_map(screen, grid):
@@ -67,7 +67,7 @@ def draw_map(screen, grid):
             if grid[k][j] == 1:
                 pygame.draw.rect(screen, GRAY, pygame.Rect(j * tile_size, k * tile_size, tile_size, tile_size))
             if grid[k][j] == 2:
-                pygame.draw.rect(screen, (255,0,0), pygame.Rect(j * tile_size, k * tile_size, tile_size, tile_size))
+                pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(j * tile_size, k * tile_size, tile_size, tile_size))
 
     return
 
@@ -91,7 +91,6 @@ def draw_line(at, to, grid):
             return
 
         for x in range(at[0], to[0] + 1):
-
             grid[at[1]][x] = 1
         return
 
@@ -101,13 +100,17 @@ mouseRes = [0, 0]
 at = 0
 to = 0
 
+n_nodes, node_grid = get_number_of_nodes_from_grid(grid)
+graph = Graph(n_nodes)
+graph.make_graph(node_grid)
+
 player = Player(1, 1, grid, screen)
-ghost_1 = Ghost(screen,1,1,grid)
+ghost_1 = Ghost(screen, 1, 1, grid)
 while not done:
     screen.fill(BLACK)
     screen.blit(sprites, (0, 0), (0, tile_size * 3, width, height))
 
-    draw_map(screen, copy)
+    draw_map(screen, node_grid)
     # for k in range(0, 28):
     #     pygame.draw.line(screen, GRAY, (k * tile_size, 0), (k * tile_size, height))
     # for k in range(0, 31):
@@ -136,18 +139,18 @@ while not done:
 
             if pressed[pygame.K_a]:
                 print("A")
-                player.set_pos(player.x-1,player.y)
+                player.set_pos(player.x - 1, player.y)
             if pressed[pygame.K_d]:
                 print("D")
-                player.set_pos(player.x+1,player.y)
+                player.set_pos(player.x + 1, player.y)
 
             if pressed[pygame.K_w]:
                 print("W")
-                player.set_pos(player.x,player.y-1)
+                player.set_pos(player.x, player.y - 1)
 
             if pressed[pygame.K_s]:
                 print("S")
-                player.set_pos(player.x,player.y+1)
+                player.set_pos(player.x, player.y + 1)
 
     player.draw()
     ghost_1.draw()
@@ -155,5 +158,5 @@ while not done:
 
     pygame.display.flip()
 
-for x in grid:
+for x in graph.dTable:
     print(x)
