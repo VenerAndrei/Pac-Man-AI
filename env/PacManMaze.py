@@ -1,5 +1,6 @@
 import pygame
-
+from env.Ghost import Ghost
+from env.Player import Player
 # SCREEN SIZES
 tile_size = 16
 width = 28 * tile_size
@@ -8,22 +9,6 @@ screen = pygame.display.set_mode((width, height))
 cols, rows = (28, 31)
 grid = [[0 for i in range(cols)] for j in range(rows)]
 
-class Player:
-
-    def __init__(self, x, y, grid, screen):
-        self.x = x
-        self.y = y
-        self.screen = screen
-        self.grid = grid
-
-    def draw(self):
-        pygame.draw.circle(self.screen, WHITE, (tile_size * self.x + tile_size / 2, tile_size * self.y + tile_size / 2),
-                           (tile_size - 4) / 2)
-#lorikatia
-    def set_pos(self, x, y):
-        if(self.grid[y][x]==1):
-            self.x = x
-            self.y = y
 
 pygame.init()
 done = False
@@ -35,7 +20,7 @@ GRAY = (255 // 2, 255 // 2, 255 // 2)
 BLACK = (0, 0, 0)
 
 print(grid)
-
+sprites = pygame.image.load("../images/map.png")
 grid = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
@@ -51,7 +36,7 @@ grid = [
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
@@ -76,8 +61,6 @@ for x in grid:
         sum += j
 
 print(sum)
-sprites = pygame.image.load("../images/map.png")
-
 
 def draw_map(screen, grid):
     for k in range(0, len(grid)):
@@ -116,16 +99,17 @@ mouseRes = [0, 0]
 at = 0
 to = 0
 
-player = Player(1, 1,grid,screen)
-
+player = Player(1, 1, grid, screen)
+ghost_1 = Ghost(screen,1,1,grid)
 while not done:
     screen.fill(BLACK)
     screen.blit(sprites, (0, 0), (0, tile_size * 3, width, height))
-    draw_map(screen, grid)
-    for k in range(0, 28):
-        pygame.draw.line(screen, GRAY, (k * tile_size, 0), (k * tile_size, height))
-    for k in range(0, 31):
-        pygame.draw.line(screen, GRAY, (0, k * tile_size), (width, k * tile_size))
+
+    #draw_map(screen, grid)
+    # for k in range(0, 28):
+    #     pygame.draw.line(screen, GRAY, (k * tile_size, 0), (k * tile_size, height))
+    # for k in range(0, 31):
+    #     pygame.draw.line(screen, GRAY, (0, k * tile_size), (width, k * tile_size))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
@@ -164,7 +148,7 @@ while not done:
                 player.set_pos(player.x,player.y+1)
 
     player.draw()
-
+    ghost_1.draw()
     # print(pygame.mouse.get_pressed(1))
 
     pygame.display.flip()
