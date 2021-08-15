@@ -1,5 +1,5 @@
 import pygame
-from env.Ghost import Ghost
+from env.Ghost import *
 from env.Player import Player
 from utils.Graph import *
 
@@ -14,6 +14,8 @@ grid = [[0 for i in range(cols)] for j in range(rows)]
 pygame.init()
 done = False
 # MAP
+FPS = 30  # frames per second setting
+fpsClock = pygame.time.Clock()
 
 # COLORS
 WHITE = (255, 255, 255)
@@ -61,8 +63,7 @@ sum = 0
 # print("Avem : {}\n".format(get_number_of_nodes_from_grid(grid)))
 
 
-def draw_map( screen, grid):
-
+def draw_map(screen, grid):
     for k in range(0, len(grid)):
         for j in range(0, len(grid[0])):
             if grid[k][j] == 1:
@@ -110,12 +111,14 @@ graph.make_graph(node_grid)
 player = Player(1, 1, grid, screen)
 ghost_1 = Ghost(screen, 1, 1, grid)
 
-dfs(graph,0,node_grid)
+dfs(graph, 0, node_grid)
+print(pick_next_node(graph, 0))
+ghost_1.head_to_node(pick_next_node(graph, 0), graph)
 while not done:
     screen.fill(BLACK)
     screen.blit(sprites, (0, 0), (0, tile_size * 3, width, height))
 
-    draw_map(screen, node_grid)
+    #draw_map(screen, node_grid)
     # for k in range(0, 28):
     #     pygame.draw.line(screen, GRAY, (k * tile_size, 0), (k * tile_size, height))
     # for k in range(0, 31):
@@ -158,10 +161,14 @@ while not done:
                 player.set_pos(player.x, player.y + 1)
 
     player.draw()
+    if ghost_1.check_delay():
+        hasArrived = ghost_1.run(graph)
+        if hasArrived:
+            ghost_1.head_to_node(pick_next_node(graph, ghost_1.heading), graph)
     ghost_1.draw()
     # print(pygame.mouse.get_pressed(1))
 
     pygame.display.flip()
-
+    fpsClock.tick(60)
 for x in graph.dTable:
     print(x)
