@@ -33,11 +33,20 @@ def get_id(x, y):
     return x * 28 + y
 
 
+def dfs(graph, source,node_grid):
+    graph.visited[source] = 1
+    node_grid[graph.nodes[source].x][graph.nodes[source].y] = 3
+    for next_node in range(0, graph.n_nodes):
+        if graph.dTable[source][next_node] != 0 and graph.visited[next_node] == 0:
+            dfs(graph, next_node,node_grid)
+
+
 class Graph:
 
     def __init__(self, n_nodes):
         self.n_nodes = n_nodes
         self.nodes = []
+        self.visited = [0 for i in range(n_nodes)]
         self.dTable = [[0 for i in range(n_nodes)] for j in range(n_nodes)]
 
     def make_graph(self, node_grid):
@@ -127,3 +136,6 @@ class Graph:
         for node in self.nodes:
             if node.id == node_id:
                 return self.nodes.index(node)
+
+    def reset(self):
+        self.visited = [0 for i in range(self.n_nodes)]

@@ -61,13 +61,16 @@ sum = 0
 # print("Avem : {}\n".format(get_number_of_nodes_from_grid(grid)))
 
 
-def draw_map(screen, grid):
+def draw_map( screen, grid):
+
     for k in range(0, len(grid)):
         for j in range(0, len(grid[0])):
             if grid[k][j] == 1:
                 pygame.draw.rect(screen, GRAY, pygame.Rect(j * tile_size, k * tile_size, tile_size, tile_size))
             if grid[k][j] == 2:
                 pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(j * tile_size, k * tile_size, tile_size, tile_size))
+            if grid[k][j] == 3:
+                pygame.draw.rect(screen, (255, 255, 0), pygame.Rect(j * tile_size, k * tile_size, tile_size, tile_size))
 
     return
 
@@ -106,6 +109,8 @@ graph.make_graph(node_grid)
 
 player = Player(1, 1, grid, screen)
 ghost_1 = Ghost(screen, 1, 1, grid)
+
+dfs(graph,0,node_grid)
 while not done:
     screen.fill(BLACK)
     screen.blit(sprites, (0, 0), (0, tile_size * 3, width, height))
