@@ -1,6 +1,7 @@
 import pygame
 from env.Ghost import Ghost
 from env.Player import Player
+from utils.Graph import *
 # SCREEN SIZES
 tile_size = 16
 width = 28 * tile_size
@@ -34,7 +35,7 @@ grid = [
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
@@ -56,17 +57,18 @@ grid = [
 
 sum = 0
 
-for x in grid:
-    for j in x:
-        sum += j
+nodes,copy = get_number_of_nodes_from_grid(grid)
+#print("Avem : {}\n".format(get_number_of_nodes_from_grid(grid)))
 
-print(sum)
 
 def draw_map(screen, grid):
     for k in range(0, len(grid)):
         for j in range(0, len(grid[0])):
             if grid[k][j] == 1:
                 pygame.draw.rect(screen, GRAY, pygame.Rect(j * tile_size, k * tile_size, tile_size, tile_size))
+            if grid[k][j] == 2:
+                pygame.draw.rect(screen, (255,0,0), pygame.Rect(j * tile_size, k * tile_size, tile_size, tile_size))
+
     return
 
 
@@ -105,7 +107,7 @@ while not done:
     screen.fill(BLACK)
     screen.blit(sprites, (0, 0), (0, tile_size * 3, width, height))
 
-    #draw_map(screen, grid)
+    draw_map(screen, copy)
     # for k in range(0, 28):
     #     pygame.draw.line(screen, GRAY, (k * tile_size, 0), (k * tile_size, height))
     # for k in range(0, 31):
