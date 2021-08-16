@@ -1,3 +1,6 @@
+import sys
+
+
 class Node:
     def __init__(self, x, y):
         self.id = x * 28 + y
@@ -33,12 +36,69 @@ def get_id(x, y):
     return x * 28 + y
 
 
-def dfs(graph, source,node_grid):
+def dfs(graph, source, node_grid):
     graph.visited[source] = 1
     node_grid[graph.nodes[source].x][graph.nodes[source].y] = 3
     for next_node in range(0, graph.n_nodes):
         if graph.dTable[source][next_node] != 0 and graph.visited[next_node] == 0:
-            dfs(graph, next_node,node_grid)
+            dfs(graph, next_node, node_grid)
+
+
+def get_min_unvisited(distance, visited):
+    mind = sys.maxsize
+    min_idx = -1
+    for x in range(len(distance)):
+        if distance[x] < mind and visited[x] == 0:
+            mind = distance[x]
+            min_idx = x
+
+    return min_idx
+
+
+def print_path(parent, source, dest):
+    print("[G] Path to source: ")
+    while dest != source:
+        print("{} -> ".format(dest), end='')
+        dest = parent[dest]
+    print(source)
+
+
+def create_path(parent, source, dest):
+    path = []
+    print("[G] Created path to source: ")
+    while dest != source:
+        path.append(dest)
+        print("{} -> ".format(dest), end='')
+        dest = parent[dest]
+    print(source)
+    path.append(source)
+    return path
+
+
+def dijkstra(graph, source):
+    visited = [0 for i in range(len(graph.nodes))]
+    distance = [sys.maxsize for i in range(len(graph.nodes))]
+    parent = [0 for i in range(len(graph.nodes))]
+    print("[G] Created distance arr with len {}".format(len(distance)))
+    distance[0] = 0
+    parent[source] = source
+    print(distance)
+    print(get_min_unvisited(distance, visited))
+
+    for c in range(graph.n_nodes - 1):
+
+        u = get_min_unvisited(distance, visited)
+        visited[u] = 1
+
+        for x in range(graph.n_nodes):
+            if visited[x] == 0 and graph.dTable[u][x] and distance[u] != sys.maxsize and distance[u] + graph.dTable[u][
+                x] < distance[x]:
+                distance[x] = distance[u] + graph.dTable[u][x]
+                parent[x] = u
+
+    print(parent)
+
+    return parent
 
 
 class Graph:
