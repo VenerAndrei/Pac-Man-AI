@@ -2,6 +2,7 @@ import pygame
 from env.Ghost import *
 from env.Player import Player
 from utils.Graph import *
+from Agent import QLearningAgent
 
 # SCORE
 score = 0
@@ -28,7 +29,7 @@ WHITE = (255, 255, 255)
 GRAY = (255 // 2, 255 // 2, 255 // 2)
 BLACK = (0, 0, 0)
 
-print(grid)
+#print(grid)
 sprites = pygame.image.load("../images/map.png")
 grid = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -62,6 +63,9 @@ grid = [
     [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
     [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+
+p = QLearningAgent()
+
 
 coin_grid = copy_arr(grid)
 
@@ -103,7 +107,7 @@ def draw_map(screen, grid):
 
 
 def draw_line(at, to, grid):
-    print(to, at)
+    #print(to, at)
     if at[0] == to[0]:
         if at[1] - to[1] > 0:
             for x in range(to[1], at[1] + 1):
