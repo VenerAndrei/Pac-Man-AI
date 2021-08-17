@@ -4,35 +4,38 @@
 
 import random,math
 from Player import *
+from Features import *
 
 class QLearningAgent(Player):
 
-    def __init__(self, **args):
-        Player.__init__(self,**args)
+    def __init__(self, x,y,grid,screen):
+        Player.__init__(self,x,y,grid,screen)
        # ReinforcementAgent.__init__(self, **args)
 
         "*** YOUR CODE HERE ***"
         self.qval = {}
-        self.epsilon = 0.2
+        self.epsilon = 0.05
+        self.discount = 0.8
+        self.alpha = 0.2
 
     def getLegalActions(self,state):
 
         actions = []
+        cols = len(self.grid[0])
+        rows = len(self.grid)
 
-        print(state[0])
-        print(state[1])
         if state[0] > 0:
-            if self.grid[state[0]-1][state[1]] == 1:
-                actions.append("north")
-        if state[0] < len(self.grid[0]):
-            if self.grid[state[0]+1][state[1]] == 1:
-                actions.append("south")
-        if state[1] > 0:
-            if self.grid[state[0]][state[1]-1] == 1:
+            if self.grid[state[1]][state[0]-1] == 1:
                 actions.append("west")
-        if state[1] < len(self.grid[0]):
-            if self.grid[state[0]-1][state[1]] == 1:
+        if state[0] < cols:
+            if self.grid[state[1]][state[0]+1] == 1:
                 actions.append("east")
+        if state[1] > 0:
+            if self.grid[state[1]-1][state[0]] == 1:
+                actions.append("north")
+        if state[1] < rows:
+            if self.grid[state[1]+1][state[0]] == 1:
+                actions.append("south")
 
         return actions
 
@@ -75,6 +78,7 @@ class QLearningAgent(Player):
         val = 0
         act = None
         for a in self.getLegalActions(state):
+            #print(self.getQValue(state,a))
             if not ok:
                 ok = 1
                 val = self.getQValue(state, a)
@@ -88,6 +92,7 @@ class QLearningAgent(Player):
           Compute the action to take in the current state.
         """
         legalActions = self.getLegalActions(state)
+       # print(legalActions)
         action = None
         "*** YOUR CODE HERE ***"
         prob = random.random()
@@ -138,16 +143,18 @@ class PacmanQAgent(QLearningAgent):
 
     def getAction(self, state):
         action = QLearningAgent.getAction(self,state)
-        self.doAction(state,action)
+        #self.doAction(state,action)
         return action
 
 
 class ApproximateQAgent(PacmanQAgent):
 
     def __init__(self, extractor='IdentityExtractor', **args):
+        self.featExtractor = IdentityExtractor()
         #self.featExtractor = util.lookup(extractor, globals())()
         PacmanQAgent.__init__(self, **args)
         self.weights = {}
+
 
     def getWeights(self):
         return self.weights
@@ -188,16 +195,15 @@ class ApproximateQAgent(PacmanQAgent):
         for f in self.featExtractor.getFeatures(state, action):
             self.weights[f] = self.weights[f] + self.alpha * diff * self.featExtractor.getFeatures(state,action).get(f)
             i += 1
-
         return self.weights
 
 
-    def final(self, state):
-        "Called at the end of each game."
+        #    def final(self, state):
+        #"Called at the end of each game."
         # call the super-class final method
-        PacmanQAgent.final(self, state)
+        #PacmanQAgent.final(self, state)
 
         # did we finish training?
-        if self.episodesSoFar == self.numTraining:
+        #if self.episodesSoFar == self.numTraining:
            #debugging here
-            pass
+         #   pass"""
