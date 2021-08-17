@@ -19,3 +19,6 @@ class Player:
         if self.grid[y][x] == 1:
             self.x = x
             self.y = y
+
+    def get_pos(self):
+        return self.x , self.y

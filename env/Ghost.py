@@ -29,6 +29,7 @@ class Ghost:
         self.heading_y = 0
         self.depart_time = 0
         self.dir = ""
+        self.destination_reached = False
 
     def draw(self):
         # pygame.draw.rect(self.screen,consts.RED,pygame.Rect((self.x * consts.tile_size + 2,self.y * consts.tile_size + 2),(consts.tile_size- 2,consts.tile_size-2)))
@@ -58,7 +59,7 @@ class Ghost:
                 self.dir = "right"
 
     def run(self, graph):
-        print("At x:{} y:{} heading to x:{} y:{} id:{}".format(self.x,self.y,self.heading_x,self.heading_y,self.heading))
+        # print("At x:{} y:{} heading to x:{} y:{} id:{}".format(self.x,self.y,self.heading_x,self.heading_y,self.heading))
         if self.heading_x == self.x and self.heading_y == self.y:
             # Arrived to destination node
             return True
@@ -80,3 +81,6 @@ class Ghost:
 
         self.depart_time = pygame.time.get_ticks()
         return True
+
+    def get_pos(self):
+        return self.y, self.x

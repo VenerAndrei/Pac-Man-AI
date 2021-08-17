@@ -65,10 +65,10 @@ def print_path(parent, source, dest):
 
 def create_path(parent, source, dest):
     path = []
-    print("[G] Created path to source: ")
+    #print("[G] Created path to source: ")
     while dest != source:
         path.append(dest)
-        print("{} -> ".format(dest), end='')
+        #print("{} -> ".format(dest), end='')
         dest = parent[dest]
     print(source)
     path.append(source)
@@ -80,10 +80,10 @@ def dijkstra(graph, source):
     distance = [sys.maxsize for i in range(len(graph.nodes))]
     parent = [0 for i in range(len(graph.nodes))]
     print("[G] Created distance arr with len {}".format(len(distance)))
-    distance[0] = 0
+    distance[source] = 0
     parent[source] = source
-    print(distance)
-    print(get_min_unvisited(distance, visited))
+    #print(distance)
+    #print(get_min_unvisited(distance, visited))
 
     for c in range(graph.n_nodes - 1):
 
@@ -96,8 +96,8 @@ def dijkstra(graph, source):
                 distance[x] = distance[u] + graph.dTable[u][x]
                 parent[x] = u
 
-    print(parent)
-
+    #print(parent)
+    print("OK")
     return parent
 
 
