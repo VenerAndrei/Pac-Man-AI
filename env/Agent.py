@@ -78,7 +78,6 @@ class QLearningAgent(Player):
         val = 0
         act = None
         for a in self.getLegalActions(state):
-            #print(self.getQValue(state,a))
             if not ok:
                 ok = 1
                 val = self.getQValue(state, a)
@@ -133,13 +132,13 @@ class QLearningAgent(Player):
 class PacmanQAgent(QLearningAgent):
     "Exactly the same as QLearningAgent, but with different default parameters"
 
-    def __init__(self, epsilon=0.05,gamma=0.8,alpha=0.2, numTraining=0, **args):
-        args['epsilon'] = epsilon
-        args['gamma'] = gamma
-        args['alpha'] = alpha
-        args['numTraining'] = numTraining
+    def __init__(self, x,y,grid,screen):
+        #args['epsilon'] = epsilon
+        #args['gamma'] = gamma
+        #args['alpha'] = alpha
+        #args['numTraining'] = numTraining
         self.index = 0  # This is always Pacman
-        QLearningAgent.__init__(self, **args)
+        QLearningAgent.__init__(self,x,y,grid,screen)
 
     def getAction(self, state):
         action = QLearningAgent.getAction(self,state)
@@ -149,10 +148,10 @@ class PacmanQAgent(QLearningAgent):
 
 class ApproximateQAgent(PacmanQAgent):
 
-    def __init__(self, extractor='IdentityExtractor', **args):
+    def __init__(self, x,y,grid,screen):
         self.featExtractor = IdentityExtractor()
         #self.featExtractor = util.lookup(extractor, globals())()
-        PacmanQAgent.__init__(self, **args)
+        PacmanQAgent.__init__(self, x,y,grid,screen)
         self.weights = {}
 
 

@@ -84,3 +84,5 @@ class Ghost:
 
     def get_pos(self):
         return self.y, self.x
+
+

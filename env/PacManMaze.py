@@ -2,7 +2,7 @@ import pygame
 from env.Ghost import *
 from env.Player import Player
 from utils.Graph import *
-from Agent import QLearningAgent
+from Agent import *
 
 # SCORE
 score = 0
@@ -200,17 +200,66 @@ while done < 500:
     print(done)
     state = player.get_pos()
     while not game_over:
+
+        if coin_grid[player.y][player.x] == 1:
+            coin_grid[player.y][player.x] = 0
+            score += 10
+
+        # CHECK FOR DEATH AND RESET ENV
+        for ghost in ghosts:
+            if player.x == ghost.y and player.y == ghost.x:
+                player.x = 1
+                player.y = 1
+                coin_grid = copy_arr(grid)
+                score = 0
+                game_over = 1
+                done+=1
+                create_reset_ghost()
+
+        for ghost in ghosts:
+            # DELETE ghos.check_delay() FOR PICKING AND MOVING THE NEXT STEP
+                hasArrived = ghost.run(graph)
+                if hasArrived:
+                    ghost.head_to_node(pick_next_node(graph, ghost.heading), graph)
+        #print(state)
+        action = player.getAction(state)
+        #print(action)
+        new_state = player.take_action(action)
+        reward = rewards[new_state[1]][new_state[0]]
+        rewards[new_state[1]][new_state[0]] = -10
+        player.update(state,action,new_state,reward)
+        state = new_state
+        # draw_path(path)
+        # if ghost_1.check_delay():
+        #     hasArrived = ghost_1.run(graph)
+        #     if hasArrived and len(path):
+        #         print(path)
+        #         ghost_1.head_to_node(path.pop(-1), graph)
+
+
+        # print(pygame.mouse.get_pressed(1))
+done = 0
+while done < 200:
+    print("Episode ")
+    game_over = 0
+    print(done)
+    state = player.get_pos()
+    player.alpha=0
+    player.epsilon=0
+    while not game_over:
+
         textsurface = font.render(
             "Heading to x:{:2d} y:{:2d} id:{:2d}".format(ghosts[0].heading_x, ghosts[0].heading_y, ghosts[0].heading),
             False,
             (255, 255, 255))
         scoresurface = font.render(
-            "Score: {:6d}".format(score), False,
-            (255, 255, 255))
+           "Score: {:6d}".format(score), False,
+           (255, 255, 255))
         screen.fill(BLACK)
         screen.blit(sprites, (0, 0), (0, tile_size * 3, width, height))
 
-        # draw_map(screen, node_grid)
+            # draw_map(screen, node_grid)
+
         draw_map(screen, target_grid)
         # for k in range(0, 28):
         #     pygame.draw.line(screen, GRAY, (k * tile_size, 0), (k * tile_size, height))
@@ -291,14 +340,19 @@ while done < 500:
                 if hasArrived:
                     ghost.head_to_node(pick_next_node(graph, ghost.heading), graph)
         #print(state)
+        print( player.getLegalActions(state))
         action = player.getAction(state)
-        #print(action)
+        print(action)
         new_state = player.take_action(action)
+        for a in player.getLegalActions(state):
+            print(player.getQValue(state,a))
+
+       # print(player.getQValue(state,action))
         reward = rewards[new_state[1]][new_state[0]]
         rewards[new_state[1]][new_state[0]] = -10
         player.update(state,action,new_state,reward)
-        print(player.getLegalActions((1,5)))
         state = new_state
+
         # draw_path(path)
         # if ghost_1.check_delay():
         #     hasArrived = ghost_1.run(graph)
@@ -311,6 +365,7 @@ while done < 500:
 
 
         # print(pygame.mouse.get_pressed(1))
+
         screen.blit(textsurface, (width + 20, 20))
         screen.blit(scoresurface, (width + 20, 50))
         pygame.display.flip()
