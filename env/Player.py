@@ -11,6 +11,7 @@ class Player:
         self.grid = grid
         self.ghosts=ghosts
         self.coin_grid = coin_grid
+        self.circle = pygame.Rect(consts.tile_size * self.x,consts.tile_size * self.y ,consts.tile_size,consts.tile_size )
 
     def draw(self):
         pygame.draw.circle(self.screen, consts.YELLOW, (

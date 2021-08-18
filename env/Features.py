@@ -80,7 +80,7 @@ class SimpleExtractor():
 
         # count the number of ghosts 1-step away
         features["#-of-ghosts-1-step-away"] = sum(
-            (next_x, next_y) in getLegalPos(g.get_pos(),grid) for g in ghosts)*(-1)
+            (next_x, next_y) in getLegalPos(g.get_pos(),grid) for g in ghosts)
 
         # if there is no danger of ghosts then add the food feature
         if not features["#-of-ghosts-1-step-away"] and coin_grid[next_y][next_x]==1:
@@ -91,7 +91,7 @@ class SimpleExtractor():
         if dist is not None:
             # make the distance a number less than one otherwise the update
             # will diverge wildly
-            features["closest-food"] = float(dist)*(-1)
+            features["closest-food"] = float(dist)
         for f in features:
             features[f] = features[f]/10
         return features
