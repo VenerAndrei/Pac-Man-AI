@@ -3,12 +3,17 @@ import env.Consts as consts
 import random
 
 
-def pick_next_node(graph, source):
+def pick_next_node(graph, source,depart):
     near_nodes_idx = []
     for x in range(graph.n_nodes):
         if graph.dTable[source][x] != 0:
             near_nodes_idx.append(x)
 
+    if len(near_nodes_idx) == 1:
+        return near_nodes_idx[0]
+
+    if depart in near_nodes_idx:
+        near_nodes_idx.remove(depart)
     random_next_node = random.choice(near_nodes_idx)
     return random_next_node
 
@@ -28,6 +33,7 @@ class Ghost:
         self.heading_x = 0
         self.heading_y = 0
         self.depart_time = 0
+        self.depart = 0
         self.dir = ""
         self.destination_reached = False
 
@@ -41,7 +47,7 @@ class Ghost:
             self.y = y
 
     def head_to_node(self, node_idx, graph):
-
+        self.depart = self.heading
         self.depart_time = pygame.time.get_ticks()
         self.heading = node_idx
         self.heading_x = graph.nodes[self.heading].x

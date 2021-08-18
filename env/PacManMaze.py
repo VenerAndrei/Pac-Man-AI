@@ -169,17 +169,17 @@ ghosts = []
 player = ApproximateQAgent(1, 1, grid, screen,ghosts,coin_grid)
 def create_reset_ghost():
     player.ghosts.clear()
-    ghost_1 = Ghost(screen, graph.nodes[65].x, graph.nodes[65].y, grid)
-    ghost_1.head_to_node(pick_next_node(graph, 65), graph)
+    ghost_1 = Ghost(screen, graph.nodes[22].x, graph.nodes[22].y, grid)
+    ghost_1.head_to_node(pick_next_node(graph, 22,ghost_1), graph)
     player.ghosts.append(ghost_1)
-    ghost_2 = Ghost(screen, graph.nodes[64].x, graph.nodes[64].y, grid)
-    ghost_2.head_to_node(pick_next_node(graph, 64), graph)
+    ghost_2 = Ghost(screen, graph.nodes[25].x, graph.nodes[25].y, grid)
+    ghost_2.head_to_node(pick_next_node(graph, 25,ghost_2), graph)
     player.ghosts.append(ghost_2)
-    ghost_3 = Ghost(screen, graph.nodes[63].x, graph.nodes[63].y, grid)
-    ghost_3.head_to_node(pick_next_node(graph, 63), graph)
+    ghost_3 = Ghost(screen, graph.nodes[32].x, graph.nodes[32].y, grid)
+    ghost_3.head_to_node(pick_next_node(graph, 32,ghost_3), graph)
     player.ghosts.append(ghost_3)
-    ghost_4 = Ghost(screen, graph.nodes[62].x, graph.nodes[62].y, grid)
-    ghost_4.head_to_node(pick_next_node(graph, 62), graph)
+    ghost_4 = Ghost(screen, graph.nodes[33].x, graph.nodes[33].y, grid)
+    ghost_4.head_to_node(pick_next_node(graph, 33,ghost_4), graph)
     player.ghosts.append(ghost_4)
 
 
@@ -240,7 +240,7 @@ while done < 50:
             #if ghost.check_delay():
             hasArrived = ghost.run(graph)
             if hasArrived:
-                ghost.head_to_node(pick_next_node(graph, ghost.heading), graph)
+                ghost.head_to_node(pick_next_node(graph, ghost.heading,ghost.depart), graph)
         #print(state)
         action = player.getAction(state,-1)
         #print(action)
@@ -376,7 +376,7 @@ while done < 200:
 
             hasArrived = ghost.run(graph)
             if hasArrived:
-                ghost.head_to_node(pick_next_node(graph, ghost.heading), graph)
+                ghost.head_to_node(pick_next_node(graph, ghost.heading,ghost.depart), graph)
         #print(state)
         #print( player.getLegalActions(state))
         action = player.getAction(state,-1)
