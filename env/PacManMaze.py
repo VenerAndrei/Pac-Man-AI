@@ -194,11 +194,19 @@ create_reset_ghost()
 # path = create_path(parent, 0, 65)
 # ghost_1.head_to_node(path.pop(-1), graph)
 target_grid = copy_arr(grid)
+def winGame(coin_grid):
+    rows = len(coin_grid)
+    cols = len(coin_grid[0])
+
+    for i in range(rows):
+        for j in range(cols):
+            if coin_grid[i][j]==1:
+                return 1
+    return 0
 #"""
 while done < 50:
-    print("Episode ")
+    print("Episode ", done)
     game_over = 0
-    print(done)
     rewards=copy_arr(copy_rewards)
     state = player.get_pos()
     while not game_over:
@@ -213,23 +221,37 @@ while done < 50:
                 player.x = 1
                 player.y = 1
                 player.coin_grid = copy_arr(grid)
-                print(score)
                 score = 0
                 game_over = 1
                 done+=1
                 create_reset_ghost()
+        if winGame(player.coin_grid) == 0:
+            player.x = 1
+            player.y = 1
+            player.coin_grid = copy_arr(grid)
+            print("WIN at ", score)
+            score = 0
+            game_over = 1
+            done += 1
+            create_reset_ghost()
 
         for ghost in player.ghosts:
             # DELETE ghos.check_delay() FOR PICKING AND MOVING THE NEXT STEP
+            #if ghost.check_delay():
             hasArrived = ghost.run(graph)
             if hasArrived:
                 ghost.head_to_node(pick_next_node(graph, ghost.heading), graph)
         #print(state)
-        action = player.getAction(state,done)
+        action = player.getAction(state,-1)
         #print(action)
         new_state = player.take_action(action)
+
         reward = rewards[new_state[1]][new_state[0]]
-        rewards[new_state[1]][new_state[0]] = -10
+        for g in player.ghosts:
+            if new_state == g.get_pos():
+                reward = -1
+        if reward > 0:
+            rewards[new_state[1]][new_state[0]] = -1
         player.update(state,action,new_state,reward)
         state = new_state
         # draw_path(path)
@@ -241,11 +263,11 @@ while done < 50:
 
 #"""
         # print(pygame.mouse.get_pressed(1))
+
 done = 0
 while done < 200:
-    print("Episode ")
+    print("Episode ", done)
     game_over = 0
-    print(done)
     state = player.get_pos()
     rewards=copy_arr(copy_rewards)
     player.alpha=0
@@ -329,30 +351,48 @@ while done < 200:
                 player.x = 1
                 player.y = 1
                 player.coin_grid = copy_arr(grid)
+                print("LOST at ", score)
                 score = 0
                 game_over = 1
                 done+=1
                 create_reset_ghost()
+
+        if winGame(player.coin_grid) == 0:
+            player.x = 1
+            player.y = 1
+            player.coin_grid = copy_arr(grid)
+            print("WIN at ", score)
+            score = 0
+            game_over = 1
+            done += 1
+            create_reset_ghost()
+
 
         draw_coins(player.coin_grid)
         player.draw()
 
         for ghost in player.ghosts:
             # DELETE ghos.check_delay() FOR PICKING AND MOVING THE NEXT STEP
-            if ghost.check_delay():
-                hasArrived = ghost.run(graph)
-                if hasArrived:
-                    ghost.head_to_node(pick_next_node(graph, ghost.heading), graph)
+
+            hasArrived = ghost.run(graph)
+            if hasArrived:
+                ghost.head_to_node(pick_next_node(graph, ghost.heading), graph)
         #print(state)
-        print( player.getLegalActions(state))
+        #print( player.getLegalActions(state))
         action = player.getAction(state,-1)
-        print(action)
+        #print(action)
         new_state = player.take_action(action)
-        for a in player.getLegalActions(state):
-            print(player.getQValue(state,a))
+
 
        # print(player.getQValue(state,action))
         reward = rewards[new_state[1]][new_state[0]]
+        for g in player.ghosts:
+            if new_state == g.get_pos():
+                print("reward negativ")
+                reward = -5
+        for f in player.featExtractor.getFeatures(state,action,player.ghosts,player.coin_grid,player.grid):
+            print(f, player.featExtractor.getFeatures(state, action, player.ghosts, player.coin_grid, player.grid).get(f),
+                  player.weights[f],reward)
         if reward > 0 :
             rewards[new_state[1]][new_state[0]] = -1
         player.update(state,action,new_state,reward)
