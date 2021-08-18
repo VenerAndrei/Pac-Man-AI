@@ -4,11 +4,13 @@ import pygame
 
 class Player:
 
-    def __init__(self, x, y, grid, screen):
+    def __init__(self, x, y, grid, screen,ghosts,coin_grid):
         self.x = x
         self.y = y
         self.screen = screen
         self.grid = grid
+        self.ghosts=ghosts
+        self.coin_grid = coin_grid
 
     def draw(self):
         pygame.draw.circle(self.screen, consts.YELLOW, (

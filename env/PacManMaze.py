@@ -1,6 +1,5 @@
 import pygame
 from env.Ghost import *
-from env.Player import Player
 from utils.Graph import *
 from Agent import *
 
@@ -79,6 +78,7 @@ for i in range(rows):
             rewards[i][j] = 10
         else:
             rewards[i][j] = -10
+copy_rewards = copy_arr(rewards)
 
 # print("Avem : {}\n".format(get_number_of_nodes_from_grid(grid)))
 
@@ -149,9 +149,9 @@ graph = Graph(n_nodes)
 graph.make_graph(node_grid)
 
 #player = Player(1, 1, grid, screen)
-
-player = QLearningAgent(1, 1, grid, screen)
 ghosts = []
+
+
 
 
 # ghost_1 = Ghost(screen, graph.nodes[65].x, graph.nodes[65].y, grid)
@@ -166,24 +166,25 @@ ghosts = []
 # ghost_4 = Ghost(screen, graph.nodes[62].x, graph.nodes[62].y, grid)
 # ghost_4.head_to_node(pick_next_node(graph, 62), graph)
 # ghosts.append(ghost_4)
-
+player = ApproximateQAgent(1, 1, grid, screen,ghosts,coin_grid)
 def create_reset_ghost():
-    ghosts.clear()
+    player.ghosts.clear()
     ghost_1 = Ghost(screen, graph.nodes[65].x, graph.nodes[65].y, grid)
     ghost_1.head_to_node(pick_next_node(graph, 65), graph)
-    ghosts.append(ghost_1)
+    player.ghosts.append(ghost_1)
     ghost_2 = Ghost(screen, graph.nodes[64].x, graph.nodes[64].y, grid)
     ghost_2.head_to_node(pick_next_node(graph, 64), graph)
-    ghosts.append(ghost_2)
+    player.ghosts.append(ghost_2)
     ghost_3 = Ghost(screen, graph.nodes[63].x, graph.nodes[63].y, grid)
     ghost_3.head_to_node(pick_next_node(graph, 63), graph)
-    ghosts.append(ghost_3)
+    player.ghosts.append(ghost_3)
     ghost_4 = Ghost(screen, graph.nodes[62].x, graph.nodes[62].y, grid)
     ghost_4.head_to_node(pick_next_node(graph, 62), graph)
-    ghosts.append(ghost_4)
+    player.ghosts.append(ghost_4)
 
 
 create_reset_ghost()
+
 #
 # dfs(graph, 0, node_grid)
 # print(pick_next_node(graph, 0))
@@ -193,36 +194,38 @@ create_reset_ghost()
 # path = create_path(parent, 0, 65)
 # ghost_1.head_to_node(path.pop(-1), graph)
 target_grid = copy_arr(grid)
-
-while done < 500:
+#"""
+while done < 50:
     print("Episode ")
     game_over = 0
     print(done)
+    rewards=copy_arr(copy_rewards)
     state = player.get_pos()
     while not game_over:
 
-        if coin_grid[player.y][player.x] == 1:
-            coin_grid[player.y][player.x] = 0
+        if player.coin_grid[player.y][player.x] == 1:
+            player.coin_grid[player.y][player.x] = 0
             score += 10
 
         # CHECK FOR DEATH AND RESET ENV
-        for ghost in ghosts:
+        for ghost in player.ghosts:
             if player.x == ghost.y and player.y == ghost.x:
                 player.x = 1
                 player.y = 1
-                coin_grid = copy_arr(grid)
+                player.coin_grid = copy_arr(grid)
+                print(score)
                 score = 0
                 game_over = 1
                 done+=1
                 create_reset_ghost()
 
-        for ghost in ghosts:
+        for ghost in player.ghosts:
             # DELETE ghos.check_delay() FOR PICKING AND MOVING THE NEXT STEP
-                hasArrived = ghost.run(graph)
-                if hasArrived:
-                    ghost.head_to_node(pick_next_node(graph, ghost.heading), graph)
+            hasArrived = ghost.run(graph)
+            if hasArrived:
+                ghost.head_to_node(pick_next_node(graph, ghost.heading), graph)
         #print(state)
-        action = player.getAction(state)
+        action = player.getAction(state,done)
         #print(action)
         new_state = player.take_action(action)
         reward = rewards[new_state[1]][new_state[0]]
@@ -236,7 +239,7 @@ while done < 500:
         #         print(path)
         #         ghost_1.head_to_node(path.pop(-1), graph)
 
-
+#"""
         # print(pygame.mouse.get_pressed(1))
 done = 0
 while done < 200:
@@ -244,6 +247,7 @@ while done < 200:
     game_over = 0
     print(done)
     state = player.get_pos()
+    rewards=copy_arr(copy_rewards)
     player.alpha=0
     player.epsilon=0
     while not game_over:
@@ -315,25 +319,25 @@ while done < 200:
                     player.set_pos(player.x, player.y + 1)
 
         # COIN COLLECT
-        if coin_grid[player.y][player.x] == 1:
-            coin_grid[player.y][player.x] = 0
+        if player.coin_grid[player.y][player.x] == 1:
+            player.coin_grid[player.y][player.x] = 0
             score += 10
 
         # CHECK FOR DEATH AND RESET ENV
-        for ghost in ghosts:
+        for ghost in player.ghosts:
             if player.x == ghost.y and player.y == ghost.x:
                 player.x = 1
                 player.y = 1
-                coin_grid = copy_arr(grid)
+                player.coin_grid = copy_arr(grid)
                 score = 0
                 game_over = 1
                 done+=1
                 create_reset_ghost()
 
-        draw_coins(coin_grid)
+        draw_coins(player.coin_grid)
         player.draw()
 
-        for ghost in ghosts:
+        for ghost in player.ghosts:
             # DELETE ghos.check_delay() FOR PICKING AND MOVING THE NEXT STEP
             if ghost.check_delay():
                 hasArrived = ghost.run(graph)
@@ -341,7 +345,7 @@ while done < 200:
                     ghost.head_to_node(pick_next_node(graph, ghost.heading), graph)
         #print(state)
         print( player.getLegalActions(state))
-        action = player.getAction(state)
+        action = player.getAction(state,-1)
         print(action)
         new_state = player.take_action(action)
         for a in player.getLegalActions(state):
@@ -349,7 +353,8 @@ while done < 200:
 
        # print(player.getQValue(state,action))
         reward = rewards[new_state[1]][new_state[0]]
-        rewards[new_state[1]][new_state[0]] = -10
+        if reward > 0 :
+            rewards[new_state[1]][new_state[0]] = -1
         player.update(state,action,new_state,reward)
         state = new_state
 
@@ -360,7 +365,7 @@ while done < 200:
         #         print(path)
         #         ghost_1.head_to_node(path.pop(-1), graph)
 
-        for ghost in ghosts:
+        for ghost in player.ghosts:
             ghost.draw()
 
 

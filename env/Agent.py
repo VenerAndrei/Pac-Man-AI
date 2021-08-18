@@ -1,15 +1,13 @@
 
-
-#from featureExtractors import *
-
 import random,math
 from Player import *
 from Features import *
 
+
 class QLearningAgent(Player):
 
-    def __init__(self, x,y,grid,screen):
-        Player.__init__(self,x,y,grid,screen)
+    def __init__(self, x,y,grid,screen,ghosts,coin_grid):
+        Player.__init__(self,x,y,grid,screen,ghosts,coin_grid)
        # ReinforcementAgent.__init__(self, **args)
 
         "*** YOUR CODE HERE ***"
@@ -86,7 +84,7 @@ class QLearningAgent(Player):
                 val = self.getQValue(state, a)
         return act
 
-    def getAction(self, state):
+    def getAction(self, state,done):
         """
           Compute the action to take in the current state.
         """
@@ -95,7 +93,10 @@ class QLearningAgent(Player):
         action = None
         "*** YOUR CODE HERE ***"
         prob = random.random()
-        if prob < self.epsilon:
+        if done >=0:
+            epsi = 1 - 1/(done+1)
+        else: epsi = 0
+        if prob <self.epsilon:
             return random.choice(legalActions)
         elif legalActions:
             return self.computeActionFromQValues(state)
@@ -132,26 +133,26 @@ class QLearningAgent(Player):
 class PacmanQAgent(QLearningAgent):
     "Exactly the same as QLearningAgent, but with different default parameters"
 
-    def __init__(self, x,y,grid,screen):
+    def __init__(self, x,y,grid,screen,ghosts,coin_grid):
         #args['epsilon'] = epsilon
         #args['gamma'] = gamma
         #args['alpha'] = alpha
         #args['numTraining'] = numTraining
         self.index = 0  # This is always Pacman
-        QLearningAgent.__init__(self,x,y,grid,screen)
+        QLearningAgent.__init__(self,x,y,grid,screen,ghosts,coin_grid)
 
-    def getAction(self, state):
-        action = QLearningAgent.getAction(self,state)
+    def getAction(self, state,done):
+        action = QLearningAgent.getAction(self,state,done)
         #self.doAction(state,action)
         return action
 
 
 class ApproximateQAgent(PacmanQAgent):
 
-    def __init__(self, x,y,grid,screen):
-        self.featExtractor = IdentityExtractor()
+    def __init__(self, x,y,grid,screen,ghosts,coin_grid):
+        self.featExtractor = SimpleExtractor()
         #self.featExtractor = util.lookup(extractor, globals())()
-        PacmanQAgent.__init__(self, x,y,grid,screen)
+        PacmanQAgent.__init__(self, x,y,grid,screen,ghosts,coin_grid)
         self.weights = {}
 
 
@@ -163,11 +164,15 @@ class ApproximateQAgent(PacmanQAgent):
            return Q(state,action) = w * featureVector
         """
         sum = 0.0
-        i = 0
 
-        for f in self.featExtractor.getFeatures(state,action):
-            sum += self.featExtractor.getFeatures(state,action).get(f)* self.weights[f]
-            i+=1
+        #print("start")
+        for f in self.featExtractor.getFeatures(state,action,self.ghosts,self.coin_grid,self.grid):
+            if f not in self.weights:
+                self.weights[f] = 0
+
+            #print(f, self.featExtractor.getFeatures(state,action,self.ghosts,self.coin_grid,self.grid).get(f),self.weights[f])
+            sum += self.featExtractor.getFeatures(state,action,self.ghosts,self.coin_grid,self.grid).get(f)* self.weights[f]
+
         self.qval[state, action] = sum
         return sum
 
@@ -187,13 +192,11 @@ class ApproximateQAgent(PacmanQAgent):
             if self.getQValue(nextState,a) >= sum:
                 sum = self.getQValue(nextState,a)
 
-        i = 0
         #difference
 
         diff = (reward + self.discount * sum) - self.getQValue(state, action)
-        for f in self.featExtractor.getFeatures(state, action):
-            self.weights[f] = self.weights[f] + self.alpha * diff * self.featExtractor.getFeatures(state,action).get(f)
-            i += 1
+        for f in self.featExtractor.getFeatures(state,action,self.ghosts,self.coin_grid,self.grid):
+            self.weights[f] = self.weights[f] + self.alpha * diff * self.featExtractor.getFeatures(state,action,self.ghosts,self.coin_grid,self.grid).get(f)
         return self.weights
 
 
