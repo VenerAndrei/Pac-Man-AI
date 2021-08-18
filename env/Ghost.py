@@ -23,7 +23,7 @@ class Ghost:
         self.ghost_sprite = pygame.image.load("../images/ghost.png")
         self.ghost_sprite = pygame.transform.scale(self.ghost_sprite, (
             consts.tile_size + consts.tile_size // 2, consts.tile_size + consts.tile_size // 2))
-        print(consts.tile_size // 2)
+       # print(consts.tile_size // 2)
         self.heading = 0
         self.heading_x = 0
         self.heading_y = 0
@@ -84,3 +84,5 @@ class Ghost:
 
     def get_pos(self):
         return self.y, self.x
+
+
