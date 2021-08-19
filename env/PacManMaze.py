@@ -205,10 +205,20 @@ def winGame(coin_grid):
                 return 1
     return 0
 #"""
+def get_reward(ghosts,player,state):
+    for ghost in ghosts:
+        if player.circle.colliderect(ghost.rect):
+            return -350
+    if winGame(player.coin_grid)==0:
+        return 200
+    if player.coin_grid[state[1]][state[0]] == 1:
+        return 10
+    else: return -6
+
 while done < 50:
     print("Episode ", done)
     game_over = 0
-    rewards=copy_arr(copy_rewards)
+
     state = player.get_pos()
     while not game_over:
 
@@ -247,12 +257,7 @@ while done < 50:
         #print(action)
         new_state = player.take_action(action)
 
-        reward = rewards[new_state[1]][new_state[0]]
-        for g in player.ghosts:
-            if new_state == g.get_pos():
-                reward = -1
-        if reward > 0:
-            rewards[new_state[1]][new_state[0]] = -1
+        reward = get_reward(player.ghosts,player,new_state)
         player.update(state,action,new_state,reward)
         state = new_state
         # draw_path(path)
@@ -270,7 +275,6 @@ while done < 200:
     print("Episode ", done)
     game_over = 0
     state = player.get_pos()
-    rewards=copy_arr(copy_rewards)
     player.alpha=0
     player.epsilon=0
     while not game_over:
@@ -289,20 +293,20 @@ while done < 200:
         #     pygame.draw.line(screen, GRAY, (k * tile_size, 0), (k * tile_size, height))
         # for k in range(0, 31):
         #     pygame.draw.line(screen, GRAY, (0, k * tile_size), (width, k * tile_size))
-        player.circle = pygame.Rect(consts.tile_size * player.x ,consts.tile_size * player.y ,consts.tile_size*2,consts.tile_size *2)
-        player.circle.center = player.x * consts.tile_size,player.y*consts.tile_size
-        pygame.draw.rect(screen,(245,65,35),player.circle,16)
+        player.circle = pygame.Rect(consts.tile_size * player.x ,consts.tile_size * player.y ,consts.tile_size*4/3,consts.tile_size *4/3)
+        #player.circle.center = player.x * consts.tile_size,player.y*consts.tile_size
+        #pygame.draw.rect(screen,(245,65,35),player.circle,16)
         for ghost in player.ghosts:
             ghost.rect = pygame.Rect(consts.tile_size * ghost.y ,
-                                    consts.tile_size * ghost.x , consts.tile_size*2,
-                                    consts.tile_size*2)
-            ghost.rect.center= ghost.y*consts.tile_size,ghost.x*consts.tile_size
-            pygame.draw.rect(screen,(245,65,35),ghost.rect,16)
+                                    consts.tile_size * ghost.x , consts.tile_size,
+                                    consts.tile_size)
+            #ghost.rect.center= ghost.y*consts.tile_size,ghost.x*consts.tile_size
+            #pygame.draw.rect(screen,(245,65,35),ghost.rect,16)
 
             #if player.x == ghost.y and player.y == ghost.x:
             if player.circle.colliderect(ghost.rect):
-                print(player.circle)
-                print(ghost.rect)
+                #print(player.circle)
+                #print(ghost.rect)
                 player.x = 1
                 player.y = 1
                 player.coin_grid = copy_arr(grid)
@@ -389,16 +393,11 @@ while done < 200:
 
 
        # print(player.getQValue(state,action))
-        reward = rewards[new_state[1]][new_state[0]]
-        for g in player.ghosts:
-            if new_state == g.get_pos():
-                print("reward negativ")
-                reward = -5
-        #for f in player.featExtractor.getFeatures(state,action,player.ghosts,player.coin_grid,player.grid):
-         #   print(f, player.featExtractor.getFeatures(state, action, player.ghosts, player.coin_grid, player.grid).get(f),
-          #        player.weights[f],reward)
-        if reward > 0 :
-            rewards[new_state[1]][new_state[0]] = -1
+        reward = get_reward(player.ghosts, player, new_state)
+        for f in player.featExtractor.getFeatures(state,action,player.ghosts,player.coin_grid,player.grid):
+            print(f, player.featExtractor.getFeatures(state, action, player.ghosts, player.coin_grid, player.grid).get(f),
+                  player.weights[f],reward)
+
         player.update(state,action,new_state,reward)
         state = new_state
 
@@ -409,10 +408,10 @@ while done < 200:
         #         print(path)
         #         ghost_1.head_to_node(path.pop(-1), graph)
         print("player")
-        print(player.circle)
+        #print(player.circle)
         for ghost in player.ghosts:
 
-            print(ghost.rect)
+         #   print(ghost.rect)
             # DELETE ghos.check_delay() FOR PICKING AND MOVING THE NEXT STEP
             # if ghost.check_delay():
             hasArrived = ghost.run(graph)
@@ -428,7 +427,7 @@ while done < 200:
         screen.blit(textsurface, (width + 20, 20))
         screen.blit(scoresurface, (width + 20, 50))
         pygame.display.flip()
-        fpsClock.tick(60)
+        fpsClock.tick(10)
     # print("x: {} y:{} x:{} y:{}".format(player.x,player.y,ghost_1.,ghost_1.y))
 # for x in graph.dTable:
 #     print(x)
