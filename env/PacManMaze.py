@@ -227,7 +227,7 @@ def reset_game(score, done, win):
     return 1, done + 1
 
 
-while done < 10:
+while done < 50:
     print("Episode ", done)
     game_over = 0
     score = 0
@@ -254,7 +254,7 @@ while done < 10:
         #         ghost_1.head_to_node(path.pop(-1), graph)
         for ghost in player.ghosts:
             # if player.circle.colliderect(ghost.rect):
-            if ghost.y == oldstate[0] and ghost.x == oldstate[1]:
+            if (ghost.y == oldstate[0] and ghost.x == oldstate[1]) or (ghost.x == player.x and ghost.y == player.y):
                 game_over, done = reset_game(score, done, 0)
         if winGame(player.coin_grid) == 0:
             game_over, done = reset_game(score, done, 1)
@@ -264,6 +264,12 @@ while done < 10:
             hasArrived = ghost.run(graph)
             if hasArrived:
                 ghost.head_to_node(pick_next_node(graph, ghost.heading, ghost.depart), graph)
+                hasArrived = ghost.run(graph)
+
+        for ghost in player.ghosts:
+            # if player.circle.colliderect(ghost.rect):
+            if (ghost.y == oldstate[0] and ghost.x == oldstate[1]) or (ghost.x == player.x and ghost.y == player.y):
+                game_over, done = reset_game(score, done, 0)
         # print(state)
         # print(pygame.mouse.get_pressed(1))
 # """
