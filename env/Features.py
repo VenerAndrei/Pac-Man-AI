@@ -38,6 +38,28 @@ def getLegalPos(state,grid):
             pos.append((state[0], state[1] + 1))
     return pos
 
+def closestGhost(pos,ghosts,grid):
+
+    fringe = [(pos[0], pos[1], 0)]
+    expanded = set()
+    while fringe:
+        pos_x, pos_y, dist = fringe.pop(0)
+        if dist > 6:
+            return 0
+        if (pos_x, pos_y) in expanded:
+            continue
+        expanded.add((pos_x, pos_y))
+        # if we find a food at this location then exit
+        for g in ghosts:
+            if (pos_x,pos_y)==g.get_pos():
+                return dist
+        # otherwise spread out from the location to its neighbours
+        nbrs = getLegalPos((pos_x, pos_y),grid)
+        for nbr_x, nbr_y in nbrs:
+            fringe.append((nbr_x, nbr_y, dist+1))
+    # no food found
+    return None
+
 
 def closestFood(pos,coin_grid,grid):
     """
@@ -60,6 +82,25 @@ def closestFood(pos,coin_grid,grid):
             fringe.append((nbr_x, nbr_y, dist+1))
     # no food found
     return None
+def getLegalActions(state,grid):
+    actions = []
+    cols = len(grid[0])
+    rows = len(grid)
+
+    if state[0] > 0:
+        if grid[state[1]][state[0] - 1] == 1:
+            actions.append("west")
+    if state[0] < cols:
+        if grid[state[1]][state[0] + 1] == 1:
+            actions.append("east")
+    if state[1] > 0:
+        if grid[state[1] - 1][state[0]] == 1:
+            actions.append("north")
+    if state[1] < rows:
+        if grid[state[1] + 1][state[0]] == 1:
+            actions.append("south")
+
+    return actions
 
 class SimpleExtractor():
 
@@ -78,6 +119,7 @@ class SimpleExtractor():
         dx, dy = dirToVec(action)
         next_x, next_y = int(x + dx), int(y + dy)
 
+
         # count the number of ghosts 1-step away
         features["#-of-ghosts-1-step-away"] = 0
 
@@ -85,14 +127,16 @@ class SimpleExtractor():
             if (next_x,next_y) in getLegalPos(g.get_pos(),grid):
                 features["#-of-ghosts-1-step-away"]+=1
 
-        for g in ghosts:
-            if (x,y) in getLegalPos(g.get_pos(),grid):
-                features["#-of-ghosts-1-step-away"]+=1
+      #  for g in ghosts:
+       #     if (x,y) in getLegalPos(g.get_pos(),grid):
+        #        features["#-of-ghosts-1-step-away"]+=1
 
-
+        distToGhost = closestGhost((next_x,next_y),ghosts,grid)
+        if distToGhost:
+            features["closest-ghost"] = 1/(float(distToGhost)*float(distToGhost))
 
         # if there is no danger of ghosts then add the food feature
-        if features["#-of-ghosts-1-step-away"]==0 and coin_grid[next_y][next_x]==1:
+        if features["#-of-ghosts-1-step-away"]==0 and coin_grid[next_y][next_x]==1 :
             features["eats-food"] = 1.0
 
         dist = closestFood((next_x, next_y),coin_grid,grid)
