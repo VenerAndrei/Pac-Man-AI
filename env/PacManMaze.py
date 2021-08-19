@@ -312,7 +312,7 @@ while done < 200:
             score += 10
         for ghost in player.ghosts:
             # if player.circle.colliderect(ghost.rect):
-            if ghost.x == oldstate[0] and ghost.y == oldstate[1]:
+            if (ghost.x == oldstate[0] and ghost.y == oldstate[1]) or (ghost.x == player.x and ghost.y == player.y):
                 game_over, done = reset_game(score, done, 0)
         if winGame(player.coin_grid) == 0:
             game_over, done = reset_game(score, done, 1)
@@ -326,7 +326,10 @@ while done < 200:
         for ghost in player.ghosts:
             ghost.draw()
         player.draw()
-
+        for ghost in player.ghosts:
+            # if player.circle.colliderect(ghost.rect):
+            if (ghost.x == oldstate[0] and ghost.y == oldstate[1]) or (ghost.x == player.x and ghost.y == player.y):
+                game_over, done = reset_game(score, done, 0)
         # print(pygame.mouse.get_pressed(1))
 
         screen.blit(textsurface, (width + 20, 20))
