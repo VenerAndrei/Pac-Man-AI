@@ -169,7 +169,6 @@ def create_reset_ghost():
     ghost_1 = Ghost(screen, graph.nodes[22].x, graph.nodes[22].y, grid)
     ghost_1.head_to_node(pick_next_node(graph, 22, ghost_1), graph)
     player.ghosts.append(ghost_1)
-
     ghost_2 = Ghost(screen, graph.nodes[25].x, graph.nodes[25].y, grid)
     ghost_2.head_to_node(pick_next_node(graph, 25, ghost_2), graph)
     player.ghosts.append(ghost_2)
@@ -313,7 +312,7 @@ while done < 200:
             score += 10
         for ghost in player.ghosts:
             # if player.circle.colliderect(ghost.rect):
-            if ghost.y == oldstate[0] and ghost.x == oldstate[1]:
+            if ghost.x == oldstate[0] and ghost.y == oldstate[1]:
                 game_over, done = reset_game(score, done, 0)
         if winGame(player.coin_grid) == 0:
             game_over, done = reset_game(score, done, 1)
@@ -322,6 +321,7 @@ while done < 200:
             hasArrived = ghost.run(graph)
             if hasArrived:
                 ghost.head_to_node(pick_next_node(graph, ghost.heading, ghost.depart), graph)
+                hasArrived = ghost.run(graph)
 
         for ghost in player.ghosts:
             ghost.draw()

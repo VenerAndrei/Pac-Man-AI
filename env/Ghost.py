@@ -39,7 +39,7 @@ class Ghost:
 
     def draw(self):
         # pygame.draw.rect(self.screen,consts.RED,pygame.Rect((self.x * consts.tile_size + 2,self.y * consts.tile_size + 2),(consts.tile_size- 2,consts.tile_size-2)))
-        self.screen.blit(self.ghost_sprite, (self.y * consts.tile_size - 4, self.x * consts.tile_size - 4))
+        self.screen.blit(self.ghost_sprite, (self.x * consts.tile_size - 4, self.y * consts.tile_size - 4))
 
     def set_pos(self, x, y):
         if self.grid[y][x] == 1:
