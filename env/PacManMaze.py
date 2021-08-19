@@ -205,10 +205,9 @@ def winGame(coin_grid):
 
 
 # """
-def get_reward(ghosts, player, state, old):
-    for ghost in ghosts:
-        if ghost.y == oldstate[0] and ghost.x == oldstate[1]:
-            return -50
+def get_reward( state,game):
+    if game == 1:
+        return -350
     if winGame(player.coin_grid) == 0:
         return 200
     if player.coin_grid[state[1]][state[0]] == 1:
@@ -227,11 +226,12 @@ def reset_game(score, done, win):
     return 1, done + 1
 
 
-while done < 50:
+while done < 500:
     print("Episode ", done)
     game_over = 0
     score = 0
     state = player.get_pos()
+    win = 0
     while not game_over:
 
         oldstate = state
@@ -239,13 +239,6 @@ while done < 50:
         # print(action)
         new_state = player.take_action(action)
 
-        reward = get_reward(player.ghosts, player, new_state, state)
-
-        player.update(state, action, new_state, reward)
-        state = new_state
-        if player.coin_grid[player.y][player.x] == 1:
-            player.coin_grid[player.y][player.x] = 0
-            score += 10
         # draw_path(path)
         # if ghost_1.check_delay():
         #     hasArrived = ghost_1.run(graph)
@@ -255,9 +248,10 @@ while done < 50:
         for ghost in player.ghosts:
             # if player.circle.colliderect(ghost.rect):
             if (ghost.y == oldstate[0] and ghost.x == oldstate[1]) or (ghost.x == player.x and ghost.y == player.y):
-                game_over, done = reset_game(score, done, 0)
+                game_over = 1
         if winGame(player.coin_grid) == 0:
-            game_over, done = reset_game(score, done, 1)
+            game_over = 1
+            win = 1
         for ghost in player.ghosts:
             # DELETE ghos.check_delay() FOR PICKING AND MOVING THE NEXT STEP
             # if ghost.check_delay():
@@ -269,7 +263,15 @@ while done < 50:
         for ghost in player.ghosts:
             # if player.circle.colliderect(ghost.rect):
             if (ghost.y == oldstate[0] and ghost.x == oldstate[1]) or (ghost.x == player.x and ghost.y == player.y):
-                game_over, done = reset_game(score, done, 0)
+                game_over = 1
+        reward = get_reward( new_state, game_over)
+        player.update(state, action, new_state, reward)
+        state = new_state
+        if player.coin_grid[player.y][player.x] == 1:
+            player.coin_grid[player.y][player.x] = 0
+            score += 10
+        if game_over:
+            game_over, done = reset_game(score, done, win)
         # print(state)
         # print(pygame.mouse.get_pressed(1))
 # """
@@ -281,6 +283,7 @@ while done < 200:
     player.alpha = 0
     player.epsilon = 0
     score = 0
+    win = 0
     while not game_over:
 
         textsurface = font.render(
@@ -304,24 +307,17 @@ while done < 200:
         new_state = player.take_action(action)
 
         # print(player.getQValue(state,action))
-        reward = get_reward(player.ghosts, player, new_state, state)
 
-        for f in player.featExtractor.getFeatures(state, action, player.ghosts, player.coin_grid, player.grid):
-            print(f,
-                  player.featExtractor.getFeatures(state, action, player.ghosts, player.coin_grid, player.grid).get(f),
-                  player.weights[f], reward)
 
-        player.update(state, action, new_state, reward)
-        state = new_state
-        if player.coin_grid[player.y][player.x] == 1:
-            player.coin_grid[player.y][player.x] = 0
-            score += 10
+
+
         for ghost in player.ghosts:
             # if player.circle.colliderect(ghost.rect):
             if (ghost.x == oldstate[0] and ghost.y == oldstate[1]) or (ghost.x == player.x and ghost.y == player.y):
-                game_over, done = reset_game(score, done, 0)
+                game_over=1
         if winGame(player.coin_grid) == 0:
-            game_over, done = reset_game(score, done, 1)
+            game_over=1
+            win = 1
 
         for ghost in player.ghosts:
             hasArrived = ghost.run(graph)
@@ -335,14 +331,27 @@ while done < 200:
         for ghost in player.ghosts:
             # if player.circle.colliderect(ghost.rect):
             if (ghost.x == oldstate[0] and ghost.y == oldstate[1]) or (ghost.x == player.x and ghost.y == player.y):
-                game_over, done = reset_game(score, done, 0)
+                game_over=1
         # print(pygame.mouse.get_pressed(1))
 
+        reward = get_reward( new_state, game_over)
+        for f in player.featExtractor.getFeatures(oldstate, action, player.ghosts, player.coin_grid, player.grid):
+            print(f,
+                  player.featExtractor.getFeatures(oldstate, action, player.ghosts, player.coin_grid, player.grid).get(f),
+                  player.weights[f], reward)
+        player.update(oldstate, action, new_state, reward)
+        state = new_state
+        if player.coin_grid[player.y][player.x] == 1:
+            player.coin_grid[player.y][player.x] = 0
+            score += 10
+
+        if game_over:
+            game_over, done = reset_game(score, done, win)
+        pygame.display.flip()
         screen.blit(textsurface, (width + 20, 20))
         screen.blit(scoresurface, (width + 20, 50))
-        print("P0x: {:2d}  P0y: {:2d}\nG1x: {:2d}  G1y: {:2d}\nG2x: {:2d}  G2y: {:2d}\nG3x: {:2d}  G3y: {:2d}\nG4x: {:2d}  G4y: {:2d}\n".format(player.x,player.y,player.ghosts[0].x,player.ghosts[0].y,player.ghosts[1].x,player.ghosts[1].y,player.ghosts[2].x,player.ghosts[2].y,player.ghosts[3].x,player.ghosts[3].y))
+        #print("P0x: {:2d}  P0y: {:2d}\nG1x: {:2d}  G1y: {:2d}\nG2x: {:2d}  G2y: {:2d}\nG3x: {:2d}  G3y: {:2d}\nG4x: {:2d}  G4y: {:2d}\n".format(player.x,player.y,player.ghosts[0].x,player.ghosts[0].y,player.ghosts[1].x,player.ghosts[1].y,player.ghosts[2].x,player.ghosts[2].y,player.ghosts[3].x,player.ghosts[3].y))
 
-        pygame.display.flip()
         fpsClock.tick(10)
 
     # print("x: {} y:{} x:{} y:{}".format(player.x,player.y,ghost_1.,ghost_1.y))

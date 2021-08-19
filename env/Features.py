@@ -85,6 +85,10 @@ class SimpleExtractor():
             if (next_x,next_y) in getLegalPos(g.get_pos(),grid):
                 features["#-of-ghosts-1-step-away"]+=1
 
+        for g in ghosts:
+            if (x,y) in getLegalPos(g.get_pos(),grid):
+                features["#-of-ghosts-1-step-away"]+=1
+
 
 
         # if there is no danger of ghosts then add the food feature
