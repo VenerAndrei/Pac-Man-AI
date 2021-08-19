@@ -3,7 +3,7 @@ import sys
 
 class Node:
     def __init__(self, x, y):
-        self.id = x * 28 + y
+        self.id = y * 28 + x
         self.x = x
         self.y = y
 
@@ -33,7 +33,7 @@ def get_number_of_nodes_from_grid(grid):
 
 
 def get_id(x, y):
-    return x * 28 + y
+    return y * 28 + x
 
 
 def dfs(graph, source, node_grid):
@@ -114,7 +114,7 @@ class Graph:
         for k in range(1, len(node_grid) - 1):
             for j in range(1, len(node_grid[0]) - 1):
                 if node_grid[k][j] == 2:
-                    node = Node(k, j)
+                    node = Node(j, k)
                     self.nodes.append(node)
 
         print("[!] Found number of nodes: {}".format(self.n_nodes))
@@ -123,73 +123,75 @@ class Graph:
         for node in self.nodes:
 
             idx_node = self.find_node_index(node.id)
-
+            print("Avem: {}".format(idx_node))
             # Find possible connected nodes in all 4 directions
             # Down
 
             dist = 1
-            walker_x = node.x + 1
-            walker_y = node.y
+            walker_x = node.x
+            walker_y = node.y+1
 
-            while node_grid[walker_x][walker_y] != 0:
+            while node_grid[walker_y][walker_x] != 0:
 
-                if node_grid[walker_x][walker_y] == 2:
+                if node_grid[walker_y][walker_x] == 2:
                     id_node_2 = get_id(walker_x, walker_y)
                     idx_node_2 = self.find_node_index(id_node_2)
                     self.dTable[idx_node][idx_node_2] = dist
                     print("[!] Created edge between {:2d} - {:2d} with distance: {:4d}".format(idx_node, idx_node_2,
                                                                                                dist))
 
-                walker_x += 1
+                walker_y += 1
                 dist += 1
 
             # up
 
             dist = 1
-            walker_x = node.x - 1
-
-            while node_grid[walker_x][walker_y] != 0:
-
-                if node_grid[walker_x][walker_y] == 2:
-                    id_node_2 = get_id(walker_x, walker_y)
-                    idx_node_2 = self.find_node_index(id_node_2)
-                    self.dTable[idx_node][idx_node_2] = dist
-                    print("[!] Created edge between {:2d} - {:2d} with distance: {:4d}".format(idx_node, idx_node_2,
-                                                                                               dist))
-                walker_x -= 1
-                dist += 1
-
-            # right
-
-            dist = 1
             walker_x = node.x
-            walker_y = node.y + 1
-
-            while node_grid[walker_x][walker_y] != 0:
-
-                if node_grid[walker_x][walker_y] == 2:
-                    id_node_2 = get_id(walker_x, walker_y)
-                    idx_node_2 = self.find_node_index(id_node_2)
-                    self.dTable[idx_node][idx_node_2] = dist
-                    print("[!] Created edge between {:2d} - {:2d} with distance: {:4d}".format(idx_node, idx_node_2,
-                                                                                               dist))
-                walker_y += 1
-                dist += 1
-
-            # left
-
-            dist = 1
             walker_y = node.y - 1
 
-            while node_grid[walker_x][walker_y] != 0:
+            while node_grid[walker_y][walker_x] != 0:
 
-                if node_grid[walker_x][walker_y] == 2:
+                if node_grid[walker_y][walker_x] == 2:
                     id_node_2 = get_id(walker_x, walker_y)
                     idx_node_2 = self.find_node_index(id_node_2)
                     self.dTable[idx_node][idx_node_2] = dist
                     print("[!] Created edge between {:2d} - {:2d} with distance: {:4d}".format(idx_node, idx_node_2,
                                                                                                dist))
                 walker_y -= 1
+                dist += 1
+
+            # right
+
+            dist = 1
+            walker_x = node.x + 1
+            walker_y = node.y
+
+            while node_grid[walker_y][walker_x] != 0:
+
+                if node_grid[walker_y][walker_x] == 2:
+                    id_node_2 = get_id(walker_x, walker_y)
+                    idx_node_2 = self.find_node_index(id_node_2)
+                    self.dTable[idx_node][idx_node_2] = dist
+                    print("[!] Created edge between {:2d} - {:2d} with distance: {:4d}".format(idx_node, idx_node_2,
+                                                                                               dist))
+                walker_x += 1
+                dist +=1
+
+            # left
+
+            dist = 1
+            walker_y = node.y
+            walker_x = node.x - 1
+
+            while node_grid[walker_y][walker_x] != 0:
+
+                if node_grid[walker_y][walker_x] == 2:
+                    id_node_2 = get_id(walker_x, walker_y)
+                    idx_node_2 = self.find_node_index(id_node_2)
+                    self.dTable[idx_node][idx_node_2] = dist
+                    print("[!] Created edge between {:2d} - {:2d} with distance: {:4d}".format(idx_node, idx_node_2,
+                                                                                               dist))
+                walker_x -= 1
                 dist += 1
 
     def find_node_index(self, node_id):

@@ -89,6 +89,6 @@ class Ghost:
         return True
 
     def get_pos(self):
-        return self.y, self.x
+        return self.x, self.y
 
 
