@@ -172,6 +172,7 @@ def create_reset_ghost():
     ghost_1 = Ghost(screen, graph.nodes[22].x, graph.nodes[22].y, grid)
     ghost_1.head_to_node(pick_next_node(graph, 22,ghost_1), graph)
     player.ghosts.append(ghost_1)
+
     ghost_2 = Ghost(screen, graph.nodes[25].x, graph.nodes[25].y, grid)
     ghost_2.head_to_node(pick_next_node(graph, 25,ghost_2), graph)
     player.ghosts.append(ghost_2)
@@ -204,37 +205,56 @@ def winGame(coin_grid):
                 return 1
     return 0
 #"""
+def get_reward(ghosts,player,state,old):
+    for ghost in ghosts:
+        if ghost.y == oldstate[0] and ghost.x == oldstate[1]:
+            return -50
+    if winGame(player.coin_grid)==0:
+        return 200
+    if player.coin_grid[state[1]][state[0]] == 1:
+        return 10
+    else: return -6
+
+def reset_game(score,done,win):
+    player.x = 1
+    player.y = 1
+    player.coin_grid = copy_arr(grid)
+    if win:
+        print("WIN at ", score)
+    create_reset_ghost()
+    return 1,done+1
+
 while done < 50:
     print("Episode ", done)
     game_over = 0
-    rewards=copy_arr(copy_rewards)
+    score = 0
     state = player.get_pos()
     while not game_over:
 
+        oldstate = state
+        action = player.getAction(state,-1)
+        #print(action)
+        new_state = player.take_action(action)
+
+        reward = get_reward(player.ghosts,player,new_state,state)
+
+        player.update(state,action,new_state,reward)
+        state = new_state
         if player.coin_grid[player.y][player.x] == 1:
             player.coin_grid[player.y][player.x] = 0
             score += 10
-
-        # CHECK FOR DEATH AND RESET ENV
+        # draw_path(path)
+        # if ghost_1.check_delay():
+        #     hasArrived = ghost_1.run(graph)
+        #     if hasArrived and len(path):
+        #         print(path)
+        #         ghost_1.head_to_node(path.pop(-1), graph)
         for ghost in player.ghosts:
-            if player.x == ghost.y and player.y == ghost.x:
-                player.x = 1
-                player.y = 1
-                player.coin_grid = copy_arr(grid)
-                score = 0
-                game_over = 1
-                done+=1
-                create_reset_ghost()
+            #if player.circle.colliderect(ghost.rect):
+            if ghost.y == oldstate[0] and ghost.x == oldstate[1]:
+                game_over,done=reset_game(score,done,0)
         if winGame(player.coin_grid) == 0:
-            player.x = 1
-            player.y = 1
-            player.coin_grid = copy_arr(grid)
-            print("WIN at ", score)
-            score = 0
-            game_over = 1
-            done += 1
-            create_reset_ghost()
-
+            game_over,done=reset_game(score,done,1)
         for ghost in player.ghosts:
             # DELETE ghos.check_delay() FOR PICKING AND MOVING THE NEXT STEP
             #if ghost.check_delay():
@@ -242,36 +262,16 @@ while done < 50:
             if hasArrived:
                 ghost.head_to_node(pick_next_node(graph, ghost.heading,ghost.depart), graph)
         #print(state)
-        action = player.getAction(state,-1)
-        #print(action)
-        new_state = player.take_action(action)
-
-        reward = rewards[new_state[1]][new_state[0]]
-        for g in player.ghosts:
-            if new_state == g.get_pos():
-                reward = -1
-        if reward > 0:
-            rewards[new_state[1]][new_state[0]] = -1
-        player.update(state,action,new_state,reward)
-        state = new_state
-        # draw_path(path)
-        # if ghost_1.check_delay():
-        #     hasArrived = ghost_1.run(graph)
-        #     if hasArrived and len(path):
-        #         print(path)
-        #         ghost_1.head_to_node(path.pop(-1), graph)
-
-#"""
         # print(pygame.mouse.get_pressed(1))
-
+#"""
 done = 0
 while done < 200:
     print("Episode ", done)
     game_over = 0
     state = player.get_pos()
-    rewards=copy_arr(copy_rewards)
     player.alpha=0
     player.epsilon=0
+    score = 0
     while not game_over:
 
         textsurface = font.render(
@@ -283,138 +283,55 @@ while done < 200:
            (255, 255, 255))
         screen.fill(BLACK)
         screen.blit(sprites, (0, 0), (0, tile_size * 3, width, height))
-
-            # draw_map(screen, node_grid)
-
         draw_map(screen, target_grid)
-        # for k in range(0, 28):
-        #     pygame.draw.line(screen, GRAY, (k * tile_size, 0), (k * tile_size, height))
-        # for k in range(0, 31):
-        #     pygame.draw.line(screen, GRAY, (0, k * tile_size), (width, k * tile_size))
-        for event in pygame.event.get():
-            game_over = 0
-            if event.type == pygame.QUIT:
-                done = 501
-            # if event.type == pygame.MOUSEBUTTONDOWN:
-            #     res = pygame.mouse.get_pos()
-            #     print(res)
-            #     if node_grid[res[1] // tile_size][res[0] // tile_size] == 3:
-            #         print("Is node idx: {}".format(graph.find_node_index(get_id(res[1] // tile_size, res[0] // tile_size))))
-            #         to_node = graph.find_node_index(get_id(res[1] // tile_size, res[0] // tile_size))
-            #         at_node = ghost_1.heading
-            #         print("At: {:2d} To:{:2d}".format(at_node, to_node))
-            #         parent = dijkstra(graph, at_node)
-            #         print_path(parent, at_node, to_node)
-            #         path = create_path(parent, at_node, to_node)
-            #         print(parent)
-            # if mouseCounter % 2 == 0:
-            #     res = pygame.mouse.get_pos()
-            #     at = res
-            #     print("Pressed at {} , {}\t that is at {},{}\n".format(res[0], res[1], res[0] // tile_size,
-            #                                                            res[1] // tile_size))
-            # if mouseCounter % 2 == 1:
-            #     res = pygame.mouse.get_pos()
-            #     to = res
-            #     print("Pressed at {} , {}\t that is at {},{}\n".format(res[0], res[1], res[0] // tile_size,
-            #                                                            res[1] // tile_size))
-            #     draw_line([at[0] // tile_size, at[1] // tile_size],
-            #               [to[0] // tile_size, to[1] // tile_size],
-            #               grid)
-            #     print("Line Draw")
-            # mouseCounter += 1
-            if event.type == pygame.KEYDOWN:
-                pressed = pygame.key.get_pressed()
-
-                if pressed[pygame.K_a]:
-                    print("A")
-                    player.set_pos(player.x - 1, player.y)
-                if pressed[pygame.K_d]:
-                    print("D")
-                    player.set_pos(player.x + 1, player.y)
-
-                if pressed[pygame.K_w]:
-                    print("W")
-                    player.set_pos(player.x, player.y - 1)
-
-                if pressed[pygame.K_s]:
-                    print("S")
-                    player.set_pos(player.x, player.y + 1)
-
-        # COIN COLLECT
-        if player.coin_grid[player.y][player.x] == 1:
-            player.coin_grid[player.y][player.x] = 0
-            score += 10
-
-        # CHECK FOR DEATH AND RESET ENV
-        for ghost in player.ghosts:
-            if player.x == ghost.y and player.y == ghost.x:
-                player.x = 1
-                player.y = 1
-                player.coin_grid = copy_arr(grid)
-                print("LOST at ", score)
-                score = 0
-                game_over = 1
-                done+=1
-                create_reset_ghost()
-
-        if winGame(player.coin_grid) == 0:
-            player.x = 1
-            player.y = 1
-            player.coin_grid = copy_arr(grid)
-            print("WIN at ", score)
-            score = 0
-            game_over = 1
-            done += 1
-            create_reset_ghost()
-
 
         draw_coins(player.coin_grid)
-        player.draw()
 
-        for ghost in player.ghosts:
-            # DELETE ghos.check_delay() FOR PICKING AND MOVING THE NEXT STEP
 
-            hasArrived = ghost.run(graph)
-            if hasArrived:
-                ghost.head_to_node(pick_next_node(graph, ghost.heading,ghost.depart), graph)
+
         #print(state)
         #print( player.getLegalActions(state))
+        oldstate = state
         action = player.getAction(state,-1)
         #print(action)
         new_state = player.take_action(action)
 
 
        # print(player.getQValue(state,action))
-        reward = rewards[new_state[1]][new_state[0]]
-        for g in player.ghosts:
-            if new_state == g.get_pos():
-                print("reward negativ")
-                reward = -5
+        reward = get_reward(player.ghosts, player, new_state,state)
+
         for f in player.featExtractor.getFeatures(state,action,player.ghosts,player.coin_grid,player.grid):
             print(f, player.featExtractor.getFeatures(state, action, player.ghosts, player.coin_grid, player.grid).get(f),
                   player.weights[f],reward)
-        if reward > 0 :
-            rewards[new_state[1]][new_state[0]] = -1
+
         player.update(state,action,new_state,reward)
         state = new_state
+        if player.coin_grid[player.y][player.x] == 1:
+            player.coin_grid[player.y][player.x] = 0
+            score += 10
+        for ghost in player.ghosts:
+            # if player.circle.colliderect(ghost.rect):
+            if ghost.y == oldstate[0] and ghost.x == oldstate[1]:
+                game_over,done = reset_game(score, done, 0)
+        if winGame(player.coin_grid) == 0:
+            game_over,done = reset_game(score, done, 1)
 
-        # draw_path(path)
-        # if ghost_1.check_delay():
-        #     hasArrived = ghost_1.run(graph)
-        #     if hasArrived and len(path):
-        #         print(path)
-        #         ghost_1.head_to_node(path.pop(-1), graph)
+
+        for ghost in player.ghosts:
+            hasArrived = ghost.run(graph)
+            if hasArrived:
+                ghost.head_to_node(pick_next_node(graph, ghost.heading, ghost.depart), graph)
 
         for ghost in player.ghosts:
             ghost.draw()
-
+        player.draw()
 
         # print(pygame.mouse.get_pressed(1))
 
         screen.blit(textsurface, (width + 20, 20))
         screen.blit(scoresurface, (width + 20, 50))
         pygame.display.flip()
-        fpsClock.tick(60)
+        fpsClock.tick(10)
     # print("x: {} y:{} x:{} y:{}".format(player.x,player.y,ghost_1.,ghost_1.y))
 # for x in graph.dTable:
 #     print(x)
