@@ -36,7 +36,6 @@ class Ghost:
         self.depart = 0
         self.dir = ""
         self.destination_reached = False
-        self.rect = pygame.Rect(consts.tile_size * self.y ,consts.tile_size * self.x ,consts.tile_size,consts.tile_size)
 
     def draw(self):
         # pygame.draw.rect(self.screen,consts.RED,pygame.Rect((self.x * consts.tile_size + 2,self.y * consts.tile_size + 2),(consts.tile_size- 2,consts.tile_size-2)))
