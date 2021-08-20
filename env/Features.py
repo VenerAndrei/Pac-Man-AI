@@ -3,9 +3,10 @@ import env.Consts as consts
 
 class IdentityExtractor():
     def getFeatures(self, state, action):
-        feats={}
+        feats = {}
         feats[(state, action)] = 1.0
         return feats
+
 
 def dirToVec(action):
     if action == "north":
@@ -18,8 +19,7 @@ def dirToVec(action):
         return 1, 0
 
 
-
-def getLegalPos(state,grid):
+def getLegalPos(state, grid):
     pos = []
     cols = len(grid[0])
     rows = len(grid)
@@ -38,7 +38,8 @@ def getLegalPos(state,grid):
             pos.append((state[0], state[1] + 1))
     return pos
 
-def closestGhost(pos,ghosts,grid):
+
+def closestGhost(pos, ghosts, grid):
 
     fringe = [(pos[0], pos[1], 0)]
     expanded = set()
@@ -51,17 +52,17 @@ def closestGhost(pos,ghosts,grid):
         expanded.add((pos_x, pos_y))
         # if we find a food at this location then exit
         for g in ghosts:
-            if (pos_x,pos_y)==g.get_pos():
+            if (pos_x, pos_y) == g.get_pos():
                 return dist
         # otherwise spread out from the location to its neighbours
-        nbrs = getLegalPos((pos_x, pos_y),grid)
+        nbrs = getLegalPos((pos_x, pos_y), grid)
         for nbr_x, nbr_y in nbrs:
             fringe.append((nbr_x, nbr_y, dist+1))
     # no food found
     return None
 
 
-def closestFood(pos,coin_grid,grid):
+def closestFood(pos, coin_grid, grid):
     """
     closestFood -- this is similar to the function that we have
     worked on in the search project; here its all in one place
@@ -74,15 +75,17 @@ def closestFood(pos,coin_grid,grid):
             continue
         expanded.add((pos_x, pos_y))
         # if we find a food at this location then exit
-        if coin_grid[pos_y][pos_x]==1:
+        if coin_grid[pos_y][pos_x] == 1:
             return dist
         # otherwise spread out from the location to its neighbours
-        nbrs = getLegalPos((pos_x, pos_y),grid)
+        nbrs = getLegalPos((pos_x, pos_y), grid)
         for nbr_x, nbr_y in nbrs:
             fringe.append((nbr_x, nbr_y, dist+1))
     # no food found
     return None
-def getLegalActions(state,grid):
+
+
+def getLegalActions(state, grid):
     actions = []
     cols = len(grid[0])
     rows = len(grid)
@@ -102,14 +105,11 @@ def getLegalActions(state,grid):
 
     return actions
 
+
 class SimpleExtractor():
-
-
 
     def getFeatures(self, state, action,ghosts, coin_grid,grid):
         # extract the grid of food and wall locations and get the ghost locations
-
-
         features = {}
 
         features["bias"] = 1.0
@@ -124,23 +124,19 @@ class SimpleExtractor():
         features["#-of-ghosts-1-step-away"] = 0
 
         for g in ghosts:
-            if (next_x,next_y) in getLegalPos(g.get_pos(),grid):
-                features["#-of-ghosts-1-step-away"]+=1
+            if (next_x, next_y) in getLegalPos(g.get_pos(), grid):
+                features["#-of-ghosts-1-step-away"] += 1
 
-      #  for g in ghosts:
-       #     if (x,y) in getLegalPos(g.get_pos(),grid):
-        #        features["#-of-ghosts-1-step-away"]+=1
-
-        distToGhost = closestGhost((next_x,next_y),ghosts,grid)
+        distToGhost = closestGhost((next_x, next_y), ghosts, grid)
         if distToGhost:
             features["inv-closest-ghost"] = 1/(float(distToGhost))
             features["closest-ghost"] = (float(distToGhost))/consts.tile_size
 
         # if there is no danger of ghosts then add the food feature
-        if features["#-of-ghosts-1-step-away"]==0 and coin_grid[next_y][next_x]==1 :
+        if features["#-of-ghosts-1-step-away"] == 0 and coin_grid[next_y][next_x] == 1:
             features["eats-food"] = 1.0
 
-        dist = closestFood((next_x, next_y),coin_grid,grid)
+        dist = closestFood((next_x, next_y), coin_grid, grid)
 
         if dist is not None:
             # make the distance a number less than one otherwise the update
@@ -149,4 +145,3 @@ class SimpleExtractor():
         for f in features:
             features[f] = features[f]/10
         return features
-

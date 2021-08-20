@@ -4,12 +4,12 @@ import pygame
 
 class Player:
 
-    def __init__(self, x, y, grid, screen,ghosts,coin_grid):
+    def __init__(self, x, y, grid, screen, ghosts, coin_grid):
         self.x = x
         self.y = y
         self.screen = screen
         self.grid = grid
-        self.ghosts=ghosts
+        self.ghosts = ghosts
         self.coin_grid = coin_grid
 
     def draw(self):
@@ -23,17 +23,15 @@ class Player:
             self.y = y
 
     def get_pos(self):
-        return self.x , self.y
+        return self.x, self.y
 
     def take_action(self, action):
-        if action=="north":
+        if action == "north":
             self.set_pos(self.x, self.y - 1)
-        elif action=="south":
+        elif action == "south":
             self.set_pos(self.x, self.y + 1)
         elif action == "west":
             self.set_pos(self.x - 1, self.y)
-        else :
+        else:
             self.set_pos(self.x + 1, self.y)
         return self.get_pos()
-
-
