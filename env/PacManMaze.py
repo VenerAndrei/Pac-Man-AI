@@ -226,7 +226,7 @@ def reset_game(score, done, win):
     return 1, done + 1
 
 
-while done < 50:
+while done < 200:
     print("Episode ", done)
     game_over = 0
     score = 0
@@ -335,10 +335,10 @@ while done < 200:
         # print(pygame.mouse.get_pressed(1))
 
         reward = get_reward( new_state, game_over,win)
-        for f in player.featExtractor.getFeatures(oldstate, action, player.ghosts, player.coin_grid, player.grid):
-            print(f,
-                  player.featExtractor.getFeatures(oldstate, action, player.ghosts, player.coin_grid, player.grid).get(f),
-                  player.weights[f], reward)
+        #for f in player.featExtractor.getFeatures(oldstate, action, player.ghosts, player.coin_grid, player.grid):
+         #   print(f,
+          #        player.featExtractor.getFeatures(oldstate, action, player.ghosts, player.coin_grid, player.grid).get(f),
+           #       player.weights[f], reward)
         player.update(oldstate, action, new_state, reward)
         state = new_state
         if player.coin_grid[player.y][player.x] == 1:
@@ -352,7 +352,7 @@ while done < 200:
         screen.blit(scoresurface, (width + 20, 50))
         #print("P0x: {:2d}  P0y: {:2d}\nG1x: {:2d}  G1y: {:2d}\nG2x: {:2d}  G2y: {:2d}\nG3x: {:2d}  G3y: {:2d}\nG4x: {:2d}  G4y: {:2d}\n".format(player.x,player.y,player.ghosts[0].x,player.ghosts[0].y,player.ghosts[1].x,player.ghosts[1].y,player.ghosts[2].x,player.ghosts[2].y,player.ghosts[3].x,player.ghosts[3].y))
 
-        fpsClock.tick(60)
+        fpsClock.tick(10)
 
     # print("x: {} y:{} x:{} y:{}".format(player.x,player.y,ghost_1.,ghost_1.y))
 # for x in graph.dTable:

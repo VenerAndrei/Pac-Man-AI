@@ -44,7 +44,7 @@ def closestGhost(pos,ghosts,grid):
     expanded = set()
     while fringe:
         pos_x, pos_y, dist = fringe.pop(0)
-        if dist > 6:
+        if dist > 5:
             return 0
         if (pos_x, pos_y) in expanded:
             continue
@@ -133,7 +133,8 @@ class SimpleExtractor():
 
         distToGhost = closestGhost((next_x,next_y),ghosts,grid)
         if distToGhost:
-            features["closest-ghost"] = 1/(float(distToGhost)*float(distToGhost))
+            features["inv-closest-ghost"] = 1/(float(distToGhost))
+            features["closest-ghost"] = (float(distToGhost))/consts.tile_size
 
         # if there is no danger of ghosts then add the food feature
         if features["#-of-ghosts-1-step-away"]==0 and coin_grid[next_y][next_x]==1 :
@@ -144,7 +145,7 @@ class SimpleExtractor():
         if dist is not None:
             # make the distance a number less than one otherwise the update
             # will diverge wildly
-            features["closest-food"] = float(dist)/(consts.tile_size*consts.tile_size*consts.tile_size*consts.tile_size)
+            features["closest-food"] = float(dist)/(consts.tile_size*consts.tile_size*consts.tile_size)
         for f in features:
             features[f] = features[f]/10
         return features
