@@ -3,7 +3,7 @@ import env.Consts as consts
 import random
 
 
-def pick_next_node(graph, source,depart):
+def pick_next_node(graph, source, depart):
     near_nodes_idx = []
     for x in range(graph.n_nodes):
         if graph.dTable[source][x] != 0:
@@ -28,7 +28,6 @@ class Ghost:
         self.ghost_sprite = pygame.image.load("../images/ghost.png")
         self.ghost_sprite = pygame.transform.scale(self.ghost_sprite, (
             consts.tile_size + consts.tile_size // 2, consts.tile_size + consts.tile_size // 2))
-       # print(consts.tile_size // 2)
         self.heading = 0
         self.heading_x = 0
         self.heading_y = 0
@@ -38,7 +37,6 @@ class Ghost:
         self.destination_reached = False
 
     def draw(self):
-        # pygame.draw.rect(self.screen,consts.RED,pygame.Rect((self.x * consts.tile_size + 2,self.y * consts.tile_size + 2),(consts.tile_size- 2,consts.tile_size-2)))
         self.screen.blit(self.ghost_sprite, (self.x * consts.tile_size - 4, self.y * consts.tile_size - 4))
 
     def set_pos(self, x, y):
@@ -65,7 +63,6 @@ class Ghost:
                 self.dir = "right"
 
     def run(self, graph):
-        # print("At x:{} y:{} heading to x:{} y:{} id:{}".format(self.x,self.y,self.heading_x,self.heading_y,self.heading))
         if self.heading_x == self.x and self.heading_y == self.y:
             # Arrived to destination node
             return True
@@ -90,5 +87,3 @@ class Ghost:
 
     def get_pos(self):
         return self.x, self.y
-
-
