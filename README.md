@@ -9,7 +9,7 @@
 <h3 align="center">PacMan AI</h3>
 
   <p align="center">
-    Developing a Q-lerning Agent and enviroment to play PacMan.
+    Developing a Q-learning Agent and enviroment to play PacMan.
   </p>
 </div>
 
@@ -119,9 +119,6 @@ Project Link: [https://github.com/VenerAndrei/Pac-Man-AI](https://github.com/Ven
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-
-
-<p align="right">(<a href="#top">back to top</a>)</p>
 
 
 
