@@ -16,7 +16,6 @@ height = 31 * tile_size
 cols, rows = (28, 31)
 screen = pygame.display.set_mode((width + 400, height))
 
-pygame.init()
 done = False
 # MAP
 FPS = 30  # frames per second setting
@@ -197,7 +196,7 @@ def reset_game(scor, games, won_game):
     return 1, games + 1
 
 
-while done < 50:
+while done < 25:
     print("Episode ", done)
     game_over = 0
     score = 0
@@ -241,6 +240,7 @@ while done < 50:
             game_over, done = reset_game(score, done, win)
 
 done = 0
+pygame.init()
 while done < 200:
     print("Episode ", done)
     game_over = 0
@@ -313,4 +313,4 @@ while done < 200:
         pygame.display.flip()
         screen.blit(textsurface, (width + 20, 20))
         screen.blit(scoresurface, (width + 20, 50))
-        fpsClock.tick(10)
+        fpsClock.tick(FPS)
