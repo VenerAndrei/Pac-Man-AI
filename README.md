@@ -9,7 +9,7 @@
 <h3 align="center">PacMan AI</h3>
 
   <p align="center">
-    Developing a Q-learning Agent and enviroment to play PacMan.
+    Developing a Q-learning Agent and environment to play PacMan.
   </p>
 </div>
 
